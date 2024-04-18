@@ -110,13 +110,15 @@ public class Pruebas extends JFrame implements Runnable{
             this.barra = barra;
             this.num = numTortuga;
         }
-
+        //
         @Override
         public void run() {
             while (barra.getValue() < barra.getMaximum()) {
                 try {
                     Thread.sleep(200);
+
                     barra.setValue(barra.getValue() + (int) (Math.random() * 20));
+
                     System.out.println("Tortuga #"+num+" Avanzo: "+barra.getValue());
                     if (barra.getValue() >= barra.getMaximum()) {
                         lblGanador.setText(lblGanador.getText() + "Tortuga "+ num+" ");
