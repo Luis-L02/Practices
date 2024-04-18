@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Pruebas extends JFrame implements Runnable{
-    private JButton btnIniciar;
+    private JButton btnIniciar, btnReiniciar;
     private JLabel lblGanador;
     private JProgressBar [] pBar;
     private Thread [] hilos;
@@ -24,11 +24,13 @@ public class Pruebas extends JFrame implements Runnable{
     private void init() {
         JPanel contentPane = (JPanel) getContentPane();
         contentPane.setLayout(new BorderLayout());
+        JPanel panelBotones = new JPanel(new FlowLayout());
         JPanel panelCentral = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         int borderGap = 10;
         int x = 5;
         btnIniciar = new JButton("Iniciar carrera");
+        btnReiniciar = new JButton("Reiniciar carrera");
         pBar = new JProgressBar[x];
         hilos = new Thread[x];
         String name ="Tortuga ";
@@ -50,15 +52,17 @@ public class Pruebas extends JFrame implements Runnable{
             panelCentral.add(pBar[i], c);
             hilos[i] = new Thread(new Tortuga(pBar[i], i+1));
         }
-        lblGanador = new JLabel("El ganador es: ");
+        lblGanador = new JLabel("Los/El ganador(es): ");
         c.gridx = 0;
         c.gridy = pBar.length + 1;
 
         panelCentral.add(lblGanador, c);
+
         btnIniciar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == btnIniciar) {
+
                     btnIniciar.setText("Carrera Iniciada");
                     btnIniciar.setEnabled(false);
                     for (int i = 0; i < hilos.length; i++) {
@@ -67,14 +71,36 @@ public class Pruebas extends JFrame implements Runnable{
                 }
             }
         });
+
+        btnReiniciar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if (actionEvent.getSource() == btnReiniciar) {
+                    for (int i = 0; i < pBar.length; i++) {
+                        pBar[i].setValue(0);
+
+                        if (hilos[i].isAlive()) {
+                            hilos[i].interrupt();
+                        }
+
+                        hilos[i] = new Thread(new Tortuga(pBar[i], i+1));
+                    }
+
+                    lblGanador.setText("Los/El ganador(es): ");
+                    btnIniciar.setEnabled(true);
+                }
+            }
+        });
+
+        panelBotones.add(btnIniciar);
+        panelBotones.add(btnReiniciar);
         contentPane.add(panelCentral, BorderLayout.CENTER);
-        add(btnIniciar, BorderLayout.SOUTH);
+        contentPane.add(panelBotones, BorderLayout.SOUTH);
     }
 
     @Override
     public void run() {
     }
-
 
     class Tortuga implements Runnable {
         private JProgressBar barra;
@@ -89,10 +115,12 @@ public class Pruebas extends JFrame implements Runnable{
         public void run() {
             while (barra.getValue() < barra.getMaximum()) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(200);
                     barra.setValue(barra.getValue() + (int) (Math.random() * 20));
+                    System.out.println("Tortuga #"+num+" Avanzo: "+barra.getValue());
                     if (barra.getValue() >= barra.getMaximum()) {
-                        lblGanador.setText(lblGanador.getText()+"Tortuga "+num);
+                        lblGanador.setText(lblGanador.getText() + "Tortuga "+ num+" ");
+                        System.out.println("Tortuga #"+num+" Ganó");
                         for (int i = 0; i < hilos.length ; i++) {
                             hilos[i].interrupt();
                         }
