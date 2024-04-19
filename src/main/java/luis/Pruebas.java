@@ -1,8 +1,6 @@
 package luis;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class Pruebas extends JFrame implements Runnable{
     private JButton btnIniciar, btnReiniciar;
@@ -40,14 +38,12 @@ public class Pruebas extends JFrame implements Runnable{
 
 
         for (int i = 0; i < pBar.length; i++) {
-            final int index = i;
             c.gridy = i;
             c.gridx = 0;
             JLabel aux = new JLabel(name + (i + 1));
             aux.setBorder(BorderFactory.createEmptyBorder(borderGap, borderGap, borderGap, borderGap));
             panelCentral.add(aux, c);
 
-            ImageIcon turtle = new ImageIcon("turtle16px.png");
             pBar[i] = new JProgressBar();
             c.gridx = 1;
 
@@ -64,37 +60,31 @@ public class Pruebas extends JFrame implements Runnable{
 
         panelCentral.add(lblGanador, c);
 
-        btnIniciar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == btnIniciar) {
+        btnIniciar.addActionListener(e -> {
+            if (e.getSource() == btnIniciar) {
 
-                    btnIniciar.setText("Carrera Iniciada");
-                    btnIniciar.setEnabled(false);
-                    for (int i = 0; i < hilos.length; i++) {
-                        hilos[i].start();
-                    }
+                btnIniciar.setText("Carrera Iniciada");
+                btnIniciar.setEnabled(false);
+                for (Thread hilo : hilos) {
+                    hilo.start();
                 }
             }
         });
 
-        btnReiniciar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (actionEvent.getSource() == btnReiniciar) {
-                    for (int i = 0; i < pBar.length; i++) {
-                        pBar[i].setValue(0);
+        btnReiniciar.addActionListener(actionEvent -> {
+            if (actionEvent.getSource() == btnReiniciar) {
+                for (int i = 0; i < pBar.length; i++) {
+                    pBar[i].setValue(0);
 
-                        if (hilos[i].isAlive()) {
-                            hilos[i].interrupt();
-                        }
-
-                        hilos[i] = new Thread(new Tortuga(pBar[i], i+1));
+                    if (hilos[i].isAlive()) {
+                        hilos[i].interrupt();
                     }
 
-                    lblGanador.setText("El ganador es: ");
-                    btnIniciar.setEnabled(true);
+                    hilos[i] = new Thread(new Tortuga(pBar[i], i+1));
                 }
+
+                lblGanador.setText("El ganador es: ");
+                btnIniciar.setEnabled(true);
             }
         });
 
@@ -109,8 +99,8 @@ public class Pruebas extends JFrame implements Runnable{
     }
 
     class Tortuga implements Runnable {
-        private JProgressBar barra;
-        private int num;
+        final private JProgressBar barra;
+        final private int num;
 
         public Tortuga(JProgressBar barra, int numTortuga) {
             this.barra = barra;
@@ -123,19 +113,16 @@ public class Pruebas extends JFrame implements Runnable{
                 try {
                     Thread.sleep(200);
 
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            barra.setValue(barra.getValue() + (int) (Math.random() * 20));
-                            System.out.println("Tortuga #"+num+" Avanzo: "+barra.getValue());
-                        }
+                    SwingUtilities.invokeLater(() -> {
+                        barra.setValue(barra.getValue() + (int) (Math.random() * 20));
+                        System.out.println("Tortuga #"+num+" Avanzo: "+barra.getValue());
                     });
 
                     if (barra.getValue() >= barra.getMaximum()) {
                         lblGanador.setText(lblGanador.getText() + "Tortuga "+ num+" ");
                         System.out.println("Tortuga #"+num+" Ganó");
-                        for (int i = 0; i < hilos.length ; i++) {
-                            hilos[i].interrupt();
+                        for (Thread hilo : hilos) {
+                            hilo.interrupt();
                         }
                         break;
                     }
