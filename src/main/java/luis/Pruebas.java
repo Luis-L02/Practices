@@ -21,6 +21,7 @@ public class Pruebas extends JFrame implements Runnable{
         init();
     }
 
+
     private void init() {
         JPanel contentPane = (JPanel) getContentPane();
         contentPane.setLayout(new BorderLayout());
@@ -29,30 +30,35 @@ public class Pruebas extends JFrame implements Runnable{
         GridBagConstraints c = new GridBagConstraints();
         int borderGap = 10;
         int x = 5;
+
+
         btnIniciar = new JButton("Iniciar carrera");
         btnReiniciar = new JButton("Reiniciar carrera");
         pBar = new JProgressBar[x];
         hilos = new Thread[x];
         String name ="Tortuga ";
 
+
         for (int i = 0; i < pBar.length; i++) {
+            final int index = i;
             c.gridy = i;
             c.gridx = 0;
             JLabel aux = new JLabel(name + (i + 1));
             aux.setBorder(BorderFactory.createEmptyBorder(borderGap, borderGap, borderGap, borderGap));
             panelCentral.add(aux, c);
 
-            c.gridx = 1;
+            ImageIcon turtle = new ImageIcon("turtle16px.png");
             pBar[i] = new JProgressBar();
+            c.gridx = 1;
+
             pBar[i].setMaximum(100);
             pBar[i].setValue(0);
             pBar[i].setStringPainted(true);
-            pBar[i].setForeground(Color.RED);
             pBar[i].setBorder(BorderFactory.createEmptyBorder(borderGap, borderGap, borderGap, borderGap));
             panelCentral.add(pBar[i], c);
             hilos[i] = new Thread(new Tortuga(pBar[i], i+1));
         }
-        lblGanador = new JLabel("Los/El ganador(es): ");
+        lblGanador = new JLabel("El ganador es: ");
         c.gridx = 0;
         c.gridy = pBar.length + 1;
 
@@ -86,7 +92,7 @@ public class Pruebas extends JFrame implements Runnable{
                         hilos[i] = new Thread(new Tortuga(pBar[i], i+1));
                     }
 
-                    lblGanador.setText("Los/El ganador(es): ");
+                    lblGanador.setText("El ganador es: ");
                     btnIniciar.setEnabled(true);
                 }
             }
@@ -117,9 +123,14 @@ public class Pruebas extends JFrame implements Runnable{
                 try {
                     Thread.sleep(200);
 
-                    barra.setValue(barra.getValue() + (int) (Math.random() * 20));
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            barra.setValue(barra.getValue() + (int) (Math.random() * 20));
+                            System.out.println("Tortuga #"+num+" Avanzo: "+barra.getValue());
+                        }
+                    });
 
-                    System.out.println("Tortuga #"+num+" Avanzo: "+barra.getValue());
                     if (barra.getValue() >= barra.getMaximum()) {
                         lblGanador.setText(lblGanador.getText() + "Tortuga "+ num+" ");
                         System.out.println("Tortuga #"+num+" Ganó");
