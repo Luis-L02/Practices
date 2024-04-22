@@ -2,7 +2,7 @@ package luis;
 import javax.swing.*;
 import java.awt.*;
 
-public class Pruebas extends JFrame implements Runnable{
+public class Pruebas extends JFrame{
     private JButton btnIniciar, btnReiniciar;
     private JLabel lblGanador;
     private JProgressBar [] pBar;
@@ -46,11 +46,11 @@ public class Pruebas extends JFrame implements Runnable{
 
             pBar[i] = new JProgressBar();
             c.gridx = 1;
-
+            pBar[i].setBorderPainted(true);
             pBar[i].setMaximum(100);
             pBar[i].setValue(0);
             pBar[i].setStringPainted(true);
-            pBar[i].setBorder(BorderFactory.createEmptyBorder(borderGap, borderGap, borderGap, borderGap));
+            pBar[i].setForeground(Color.GREEN);
             panelCentral.add(pBar[i], c);
             hilos[i] = new Thread(new Tortuga(pBar[i], i+1));
         }
@@ -94,10 +94,6 @@ public class Pruebas extends JFrame implements Runnable{
         contentPane.add(panelBotones, BorderLayout.SOUTH);
     }
 
-    @Override
-    public void run() {
-    }
-
     class Tortuga implements Runnable {
         final private JProgressBar barra;
         final private int num;
@@ -111,10 +107,10 @@ public class Pruebas extends JFrame implements Runnable{
         public void run() {
             while (barra.getValue() < barra.getMaximum()) {
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(5);
 
                     SwingUtilities.invokeLater(() -> {
-                        barra.setValue(barra.getValue() + (int) (Math.random() * 20));
+                        barra.setValue(barra.getValue() + (int) (Math.random() * 2));
                         System.out.println("Tortuga #"+num+" Avanzo: "+barra.getValue());
                     });
 
